@@ -1,0 +1,9 @@
+requests==2.32.3
+lnetatmo==4.1.1
+pandas==2.2.3
+tqdm==4.67.1
+numpy==1.26.4
+xarray==2025.1.1
+matplotlib==3.9.3
+cartopy==0.24.0
+gridpp==0.7.1
