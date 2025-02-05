@@ -88,7 +88,7 @@ def save_data(locations_df, station_temps_list, start_date, end_date, date):
 
 time_list = []
 
-dataframe = pd.read_csv('/home/ewalsh/Documents/projects/dublin_temps/wunderground_api/wundermap_stations.csv')
+dataframe = pd.read_csv('/wundermap_stations.csv')
 
 def get_temp_data(date):
 
