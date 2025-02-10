@@ -12,12 +12,18 @@ import numpy as np
 import pandas as pd
 import cartopy.crs as ccrs
 import gridpp
+import sys
+import os
 
-date = "2024-10-28"
+date = sys.argv[1] #"2024-10-28"
 
-date = date.replace("-", "")
+date = date.replace("-","")
 
-ds = xr.open_dataset('/home/ewalsh/Documents/projects/dublin_temps/grib/fc'+date+'0000_60_instant_t_sfc_2_geo_50.9932_348.998_643x589x750m.grib2', engine='cfgrib')
+directory = sys.argv[2]
+
+full_dir = os.path.join(directory, "fc"+date+"0000_60_instant_t_sfc_2_geo_50.9932_348.998_643x589x750m.grib2")
+
+ds = xr.open_dataset(full_dir, engine='cfgrib', indexpath='')
 
 ds = ds.assign_coords(longitude=(ds.longitude % 360))
 ds = ds.assign_coords(longitude=(("y", "x"), np.where(ds.longitude > 180, ds.longitude - 360, ds.longitude)))
