@@ -7,7 +7,7 @@ Date="2024-10-28" #YYYY-MM-DD
 
 Directory="/nfs/archive/prod/archive/Harmonie/HECTOR" #directory address to the HECTOR grib files
 
-source ~/miniforge3/etc/profile.d/conda.sh
+source /home/ewalsh/miniforge3/etc/profile.d/conda.sh
 
 conda activate test
 
