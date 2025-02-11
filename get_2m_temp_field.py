@@ -17,11 +17,15 @@ import os
 
 date = sys.argv[1] #"2024-10-28"
 
+split_date = date.split("-")
+
+year, month, day = split_date[0], split_date[1], split_date[2]
+
 date = date.replace("-","")
 
 directory = sys.argv[2]
 
-full_dir = os.path.join(directory, "fc"+date+"0000_60_instant_t_sfc_2_geo_50.9932_348.998_643x589x750m.grib2")
+full_dir = os.path.join(directory, year, month, day, "00","fc"+date+"0000_60_instant_t_sfc_2_geo_50.9932_348.998_643x589x750m.grib2")
 
 ds = xr.open_dataset(full_dir, engine='cfgrib', indexpath='')
 

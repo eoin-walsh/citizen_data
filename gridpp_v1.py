@@ -13,6 +13,7 @@ import pandas as pd
 import cartopy.crs as ccrs
 import gridpp
 import os
+import sys
 
 def getLatLon(dataframe):
     
@@ -30,10 +31,20 @@ def getLatLon(dataframe):
         latitude.append(float(lat))
         
     return longitude, latitude
-    
-date = "2024-10-28"
 
-ds = xr.open_dataset('/home/ewalsh/Documents/projects/dublin_temps/grib/fc202410280000_60_instant_t_sfc_2_geo_50.9932_348.998_643x589x750m.grib2', engine='cfgrib')
+date = sys.argv[1] #"2024-10-28"
+
+split_date = date.split("-")
+
+year, month, day = split_date[0], split_date[1], split_date[2]
+
+date_edit = date.replace("-","")
+
+directory = sys.argv[2]
+
+full_dir = os.path.join(directory, year, month, day, "00","fc"+date_edit+"0000_60_instant_t_sfc_2_geo_50.9932_348.998_643x589x750m.grib2")
+
+ds = xr.open_dataset(full_dir, engine='cfgrib')
 
 ds = ds.assign_coords(longitude=(ds.longitude % 360))
 ds = ds.assign_coords(longitude=(("y", "x"), np.where(ds.longitude > 180, ds.longitude - 360, ds.longitude)))
@@ -41,7 +52,7 @@ ds = ds.assign_coords(longitude=(("y", "x"), np.where(ds.longitude > 180, ds.lon
 ds = ds - 273.15
 
 # Create a figure with Cartopy projection
-fig, ax = plt.subplots(subplot_kw={"projection": ccrs.PlateCarree()})
+fig, ax = plt.subplots(figsize=(10,8), subplot_kw={"projection": ccrs.PlateCarree()})
 
 # Plot the data using the adjusted longitude
 ds.t2m.plot(
@@ -56,10 +67,9 @@ ds.t2m.plot(
 # Add geographical features
 ax.coastlines()
 ax.gridlines(draw_labels=True, linewidth=0.5, color="gray", alpha=0.5, linestyle="--")
-ax.set_extent([-11, -5, 51, 56], crs=ccrs.PlateCarree())  # Adjust extent to your data's bounds
+ax.set_extent([-10.5, -5.5, 51, 56], crs=ccrs.PlateCarree())  # Adjust extent to your data's bounds
 
 plt.title("Temperature (t2m) with Corrected Longitude and Land Borders")
-plt.show()
 
 df_locations = pd.read_csv(os.path.join(os.getcwd(), "netatmo_data", date, "device_locations_"+date+".csv"))
 
@@ -109,7 +119,6 @@ ax.set_extent([min_lon-(0.1*np.abs(max_lon-min_lon)),
 ax.scatter(x=longitude, y = latitude, c = temps_date.values, s= 20, cmap="coolwarm", vmin=0, vmax=25, edgecolors='k',linewidths=0.3)
 
 plt.title("Temperature (t2m) forecast with netatmo data plotted")
-plt.show()
 
 # Create a figure with Cartopy projection
 fig, ax = plt.subplots(figsize=(10,6), subplot_kw={"projection": ccrs.PlateCarree()})
@@ -139,40 +148,40 @@ ax.scatter(x=longitude, y=latitude, s=20)
 plt.title("Temperature (t2m) forecast with netatmo data plotted")
 plt.show()
 
-mask = (
-    (ds.latitude >= min_lat-(0.15*np.abs(max_lat-min_lat))) & (ds.latitude <= max_lat+(0.15*np.abs(max_lat-min_lat))) &
-    (ds.longitude >= min_lon-(0.15*np.abs(max_lon-min_lon))) & (ds.longitude <= max_lon+(0.15*np.abs(max_lon-min_lon)))
-)
+# mask = (
+#     (ds.latitude >= min_lat-(0.15*np.abs(max_lat-min_lat))) & (ds.latitude <= max_lat+(0.15*np.abs(max_lat-min_lat))) &
+#     (ds.longitude >= min_lon-(0.15*np.abs(max_lon-min_lon))) & (ds.longitude <= max_lon+(0.15*np.abs(max_lon-min_lon)))
+# )
 
-sliced_data = ds.where(mask, drop=True)
+# sliced_data = ds.where(mask, drop=True)
 
 # Create a figure with Cartopy projection
-fig, ax = plt.subplots(figsize=(10,6), subplot_kw={"projection": ccrs.PlateCarree()})
+# fig, ax = plt.subplots(figsize=(10,6), subplot_kw={"projection": ccrs.PlateCarree()})
 
-# Plot the data using the adjusted longitude
-sliced_data.t2m.plot(
-                    ax=ax,
-                    transform=ccrs.PlateCarree(),  # Data's coordinate reference system
-                    cmap=plt.cm.coolwarm,
-                    cbar_kwargs={"label": "Temperature (°C)",
-                                 "orientation": 'horizontal'},
-                    x='longitude',
-                    y='latitude', vmin=0, 
-                    vmax=25
-                )
+# # Plot the data using the adjusted longitude
+# sliced_data.t2m.plot(
+#                     ax=ax,
+#                     transform=ccrs.PlateCarree(),  # Data's coordinate reference system
+#                     cmap=plt.cm.coolwarm,
+#                     cbar_kwargs={"label": "Temperature (°C)",
+#                                  "orientation": 'horizontal'},
+#                     x='longitude',
+#                     y='latitude', vmin=0, 
+#                     vmax=25
+#                 )
 
-# Add geographical features
-ax.coastlines()
-ax.gridlines(draw_labels=True, linewidth=0.5, color="gray", alpha=0.5, linestyle="--")
-ax.set_extent([min_lon-(0.1*np.abs(max_lon-min_lon)), 
-               max_lon+(0.1*np.abs(max_lon-min_lon)),
-               min_lat-(0.1*np.abs(max_lat-min_lat)), 
-               max_lat+(0.1*np.abs(max_lat-min_lat))], crs=ccrs.PlateCarree())  # Adjust extent to your data's bounds
+# # Add geographical features
+# ax.coastlines()
+# ax.gridlines(draw_labels=True, linewidth=0.5, color="gray", alpha=0.5, linestyle="--")
+# ax.set_extent([min_lon-(0.1*np.abs(max_lon-min_lon)), 
+#                max_lon+(0.1*np.abs(max_lon-min_lon)),
+#                min_lat-(0.1*np.abs(max_lat-min_lat)), 
+#                max_lat+(0.1*np.abs(max_lat-min_lat))], crs=ccrs.PlateCarree())  # Adjust extent to your data's bounds
 
-ax.scatter(x=longitude, y = latitude, s= 20)
+# ax.scatter(x=longitude, y = latitude, s= 20)
 
-plt.title("Temperature (t2m) forecast with netatmo data plotted")
-plt.show()
+# plt.title("Temperature (t2m) forecast with netatmo data plotted")
+# plt.show()
 
 # grid = gridpp.Grid(np.array(longitude).reshape(-1,1), np.array(latitude).reshape(-1,1))
 
@@ -220,6 +229,3 @@ plt.show()
 #                max_lat+(0.1*np.abs(max_lat-min_lat))], crs=ccrs.PlateCarree())  # Adjust extent to your data's bounds
 
 # ax.scatter(x=longitude, y = latitude, c = temps_date.values, s= 20, cmap="coolwarm", vmin=0, vmax=25, edgecolors='k',linewidths=0.3)
-
-# plt.title("Temperature (t2m) forecast with netatmo data plotted")
-# plt.show()
