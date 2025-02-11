@@ -5,7 +5,7 @@
 
 Date="2024-10-28" #YYYY-MM-DD
 
-Directory="/home/ewalsh/Documents/projects/dublin_temps/grib" #directory address to the HECTOR grib files
+Directory="/nfs/archive/prod/archive/Harmonie/HECTOR" #directory address to the HECTOR grib files
 
 source ~/miniforge3/etc/profile.d/conda.sh
 
